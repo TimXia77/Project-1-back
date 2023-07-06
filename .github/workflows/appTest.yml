@@ -1,0 +1,31 @@
+name: Automated Testing
+
+on:
+    push:
+        branches:
+            - main 
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 14
+
+            #Work code in "main" directory
+            - name: Install dependencies
+              run: npm i
+              working-directory: ./main
+
+            - name: Install dependencies for data access layer
+              run: npm i
+
+            - name: Run tests
+              run: npm run test
+              working-directory: ./main
