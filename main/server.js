@@ -121,7 +121,7 @@ app.post("/table", (req, res) => {
     if (authHelper.authCookie(req.body.cookie)){
         res.status(200).json(dataLayer.readTable());
     } else {
-        res.status(405).json('405 FROM THE API');
+        res.status(405).json({error: 'Authentication failed' });
     }
 });
 

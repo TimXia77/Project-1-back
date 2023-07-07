@@ -1,7 +1,7 @@
 {
-  "name": "pendrive-inventory-manager",
+  "name": "pendrive-inventory-manager-api",
   "version": "1.0.0",
-  "description": "Project #1: A pendrive inventory manager that uses the Web Experience Toolkit and consumes a RESTful API.",
+  "description": "Project #1: A pendrive inventory manager RESTful API.",
   "main": "server.js",
   "directories": {
     "test": "test"
