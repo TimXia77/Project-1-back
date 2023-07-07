@@ -30,14 +30,17 @@ const cache = require("./cache.js");
 //Constants (for readability)
 const registerPage = ["/", "/register"];
 const PORT = 3000;
+
+//Data that is off limits (used for testing) / Code to aid testing:
+dataLayer.deleteUser('newUserTest');
+// const existingEmail = 'TestTest@test.test';
+// const existingUsername = 'existUserTest';
+
+// const newEmail = "TestExisting@test.test"
+// const newUsername = 'newUserTest';
+
+//API Specification:
 const swaggerDocument = YAML.load('./apiSpecification.yaml');
-
-//Data that is off limits (used for testing)
-const existingEmail = 'TestTest@test.test';
-const existingUsername = 'existUserTest';
-
-const newEmail = "TestExisting@test.test"
-const newUsername = 'newUserTest';
 
 const swaggerOptions = {
     swaggerDefinition: swaggerDocument,
@@ -48,10 +51,8 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //http://localhost:3000/api-docs
 
-dataLayer.deleteUser('newUserTest');
 
 //Routes
-
 
 app.post(registerPage, async (req, res) => {
     if (!((req.body.email).includes("@"))) {        //Check if username, password, and email pass restrictions
@@ -71,24 +72,22 @@ app.post(registerPage, async (req, res) => {
     const usernameUser = dataArr.find(findUser => findUser.username === req.body.username); //variables to determine if an account already exists.
     const emailUser = dataArr.find(findUser => findUser.email === req.body.email);
 
-    if (usernameUser && emailUser) {     //username and email taken
+    if (usernameUser && emailUser) {     //Check if username, password, and email are not taken
         return res.status(409).json({error: 'Username and email taken' });
 
-    } else if (emailUser) {              //email taken
+    } else if (emailUser) {              
         return res.status(409).json({error: 'Email already taken' });
         
-    } else if (usernameUser) {          //user with that username already exists
+    } else if (usernameUser) {          
         return res.status(409).json({error: 'Username already taken' });
 
     } else {
         try {   //valid information! Creating account
 
             await (dataLayer.addUser(req.body.email, req.body.username, req.body.password));
-
-            //logging user in:
             const token = authHelper.createUserToken(req.body.username);
 
-            return res.status(200).json({ cookie: token }); //should send back status 200 with cookie str. front end should make 
+            return res.status(200).json({ cookie: token }); 
 
         } catch {
             res.status(500).send("Internal error occured when registering!");
@@ -98,7 +97,6 @@ app.post(registerPage, async (req, res) => {
 
 
 app.post("/login", (req, res) => {
-
     if (dataLayer.findUser(req.body.username, req.body.password)) {
         try {
             const token = authHelper.createUserToken(req.body.username);
@@ -115,15 +113,16 @@ app.post("/login", (req, res) => {
 });
 
 
-//Data page //removed cache(15)
-app.post("/table", (req, res) => {
-
+//Data page 
+//Inventory Management: When the table is updated, the cache should be updated.
+app.post("/table", cache(3600), (req, res) => {
     if (authHelper.authCookie(req.body.cookie)){
         res.status(200).json(dataLayer.readTable());
     } else {
         res.status(405).json({error: 'Authentication failed' });
     }
 });
+
 
 //Start the server
 app.listen(PORT, () => {
