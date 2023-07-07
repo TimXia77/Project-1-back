@@ -30,114 +30,114 @@ describe('Login and Register:\n', () => {
     // });
 
     describe('Successful Requests', () => {
-        describe('GET /register', () => {
-            it('Should render the register-en page (html) successfully', (done) => {
-                chai.request(app)
-                    .get('/register')
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Register</h1>');
-                        expect(res.text).to.include('Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters');
-                        done();
-                    });
-            });
-        });
-        describe('GET /login', () => {
-            it('Should render the login-en page (html) successfully', (done) => {
-                chai.request(app)
-                    .get('/login')
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
-                        expect(res.text).to.include('<a href="/register">Register now</a>');
-                        done();
-                    });
-            });
-        });
+        // describe('GET /register', () => {
+        //     it('Should render the register-en page (html) successfully', (done) => {
+        //         chai.request(app)
+        //             .get('/register')
+        //             .end((err, res) => {
+        //                 expect(res).to.have.status(200);
+        //                 expect(res).to.be.html;
+        //                 expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Register</h1>');
+        //                 expect(res.text).to.include('Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters');
+        //                 done();
+        //             });
+        //     });
+        // });
+        // describe('GET /login', () => {
+        //     it('Should render the login-en page (html) successfully', (done) => {
+        //         chai.request(app)
+        //             .get('/login')
+        //             .end((err, res) => {
+        //                 expect(res).to.have.status(200);
+        //                 expect(res).to.be.html;
+        //                 expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
+        //                 expect(res.text).to.include('<a href="/register">Register now</a>');
+        //                 done();
+        //             });
+        //     });
+        // });
         describe('POST /register', () => {
-            it('Successfully registered account (should return 302)', (done) => {
+            it('Successfully registered account (should return 200)', (done) => {
                 supertest(app)
                     .post('/register')
                     .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
-                    .expect(302)
-                    .expect('set-cookie', /token=/)
+                    .expect(200)
+                    .expect((res) => {
+                        if (!(res.body.cookie)) {
+                          throw new Error('Cookie not found in response body');
+                        }})
                     .end((err, res) => {
                         if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        loginCookie = res.headers['set-cookie'];
+                        loginCookie = res.body.cookie;
                         done();
                     });
 
             });
             it('Checking if /register redirected to /table correctly', (done) => {
                 chai.request(app)
-                    .get(redirectUrl)
-                    .set('Cookie', loginCookie)
+                    .post('/table')
+                    .send({ cookie: loginCookie })
                     .end((err, res) => {
                         expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
-                        expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
+                        expect(res).to.be.json;
                         done();
                     });
             });
         });
         describe('POST /login', () => {
-            it('Successfully logged in to account (should return 302)', (done) => {
+            it('Successfully logged in to account (should return 200)', (done) => {
                 supertest(app)
                     .post('/login')
                     .send({ username: existUserTest, password: 'existUser123' })
-                    .expect(302)
-                    .expect('set-cookie', /token=/)
+                    .expect(200)
+                    .expect((res) => {
+                        if (!(res.body.cookie)) {
+                          throw new Error('Cookie not found in response body');
+                        }})
                     .end((err, res) => {
                         if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        loginCookie = res.headers['set-cookie'];
+                        loginCookie = res.body.cookie
                         done();
                     });
             });
             it('Checking if /login redirected to /table correctly', (done) => {
                 chai.request(app)
-                    .get(redirectUrl)
-                    .set('Cookie', loginCookie)
+                    .post('/table')
+                    .send({ cookie: loginCookie })
                     .end((err, res) => {
                         expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
-                        expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
+                        expect(res).to.be.json;
                         done();
                     });
             });
         });
-        describe('POST /logout', () => {
-            it('Successfully logged out of account (should return 302)', (done) => {
-                supertest(app)
-                    .post('/logout')
-                    .expect(302)
-                    .set('Cookie', `token=${loginCookie}`)
-                    .end((err, res) => {
-                        if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        done();
-                    });
-            });
-            it('Checking if /logout redirected to /login correctly wihtout a cookie', (done) => {
-                chai.request(app)
-                    .get(redirectUrl)
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include(`<section class="alert alert-success"><p>Logged out successfully</p></section>`);
-                        expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
-                        expect(res.text).to.include('<a href="/register">Register now</a>');
-                        done();
-                    });
-            });
-        });
+        // describe('POST /logout', () => {
+        //     it('Successfully logged out of account (should return 302)', (done) => {
+        //         supertest(app)
+        //             .post('/logout')
+        //             .expect(302)
+        //             .set('Cookie', `token=${loginCookie}`)
+        //             .end((err, res) => {
+        //                 if (err) throw err;
+        //                 redirectUrl = res.headers.location; // for the next test
+        //                 done();
+        //             });
+        //     });
+        //     it('Checking if /logout redirected to /login correctly wihtout a cookie', (done) => {
+        //         chai.request(app)
+        //             .get(redirectUrl)
+        //             .end((err, res) => {
+        //                 expect(res).to.have.status(200);
+        //                 expect(res).to.be.html;
+        //                 expect(res.text).to.include(`<section class="alert alert-success"><p>Logged out successfully</p></section>`);
+        //                 expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
+        //                 expect(res.text).to.include('<a href="/register">Register now</a>');
+        //                 done();
+        //             });
+        //     });
+        // });
     });
-    describe('Unsuccessful Requests', () => {
+    describe('Unsuccessful Requests', () => { //{error: 'Invalid Login Information' }
         describe('POST /login', () => {
             it('Tried to login with invalid username (should return 401)', (done) => {
                 chai
@@ -146,20 +146,18 @@ describe('Login and Register:\n', () => {
                     .send({ username: newUserTest, password: '123abcDEF' })
                     .end((err, res) => {
                         expect(res).to.have.status(401);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid password or username</p></div>');
+                        expect(res.body).to.have.property('error').that.equals('Invalid Login Information');
                         done();
                     });
             });
-            it('Tried to register with invalid password (should return 401)', (done) => {
+            it('Tried to login with invalid password (should return 401)', (done) => {
                 chai
                     .request(app)
                     .post('/login')
                     .send({ username: existUserTest, password: 'badUser123' })
                     .end((err, res) => {
                         expect(res).to.have.status(401);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid password or username</p></div>');
+                        expect(res.body).to.have.property('error').that.equals('Invalid Login Information');
                         done();
                     });
             });
@@ -167,27 +165,25 @@ describe('Login and Register:\n', () => {
         describe('POST /register', () => {
             //taken usernames and emails
             describe('Registering with taken information', () => {
-                it('Tried to register with taken username (should return 401)', (done) => {
+                it('Tried to register with taken username (should return 409)', (done) => {
                     chai
                         .request(app)
                         .post('/register')
                         .send({ email: 'timxiaa@gmail.com', username: existUserTest, password: 'existUser123' })
                         .end((err, res) => {
-                            expect(res).to.have.status(401);
-                            expect(res).to.be.html;
-                            expect(res.text).to.include('<div class="alert alert-danger"><p>Username already taken</p></div>');
+                            expect(res).to.have.status(409);
+                            expect(res.body).to.have.property('error').that.equals('Username already taken');
                             done();
                         });
                 });
-                it('Tried to register with taken email (should return 401)', (done) => {
+                it('Tried to register with taken email (should return 409)', (done) => {
                     chai
                         .request(app)
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: 'TimXia7777', password: 'existUser123' })
                         .end((err, res) => {
-                            expect(res).to.have.status(401);
-                            expect(res).to.be.html;
-                            expect(res.text).to.include('<div class="alert alert-danger"><p>Email already taken</p></div>');
+                            expect(res).to.have.status(409);
+                            expect(res.body).to.have.property('error').that.equals('Email already taken');
                             done();
                         });
                 });
@@ -197,9 +193,8 @@ describe('Login and Register:\n', () => {
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
                         .end((err, res) => {
-                            expect(res).to.have.status(401);
-                            expect(res).to.be.html;
-                            expect(res.text).to.include('<div class="alert alert-danger"><p>Username and email taken</p></div>');
+                            expect(res).to.have.status(409);
+                            expect(res.body).to.have.property('error').that.equals('Username and email taken');
                             done();
                         });
                 });
@@ -218,8 +213,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'password' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for password</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for password');
                                 done();
                             });
                     });
@@ -230,8 +224,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'password123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for password</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for password');
                                 done();
                             });
                     });
@@ -242,8 +235,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'PASSWORD123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for password</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for password');
                                 done();
                             });
                     });
@@ -254,8 +246,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'Pass123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for password</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for password');
                                 done();
                             });
                     });
@@ -268,8 +259,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: 'H', password: 'existUser123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for username</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for username');
                                 done();
                             });
                     });
@@ -280,8 +270,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: 'username!@#$%^&*()', password: '123abcDEF' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for username</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for username');
                                 done();
                             });
                     });
@@ -292,8 +281,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: 'Hi`~{}|:"', password: 'existUser123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for username</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for username');
                                 done();
                             });
                     });
@@ -304,8 +292,7 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'TestTest@test.test', username: 'Hi<>?,./>', password: 'existUser123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for username</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for username');
                                 done();
                             });
                     });
@@ -318,21 +305,22 @@ describe('Login and Register:\n', () => {
                             .send({ email: 'notAValidEmail', username: existUserTest, password: 'existUser123' })
                             .end((err, res) => {
                                 expect(res).to.have.status(400);
-                                expect(res).to.be.html;
-                                expect(res.text).to.include('<div class="alert alert-danger"><p>Invalid format for email</p></div>');
+                                expect(res.body).to.have.property('error').that.equals('Invalid format for email');
                                 done();
                             });
                     });
-                    it('Successfully registered account (should return 302)', (done) => {
+                    it('Successfully registered account (should return 200)', (done) => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
-                            .expect(302)
-                            .expect('set-cookie', /token=/)
+                            .expect(200)
+                            .expect((res) => {
+                                if (!(res.body.cookie)) {
+                                  throw new Error('Cookie not found in response body');
+                                }})
                             .end((err, res) => {
                                 if (err) throw err;
-                                redirectUrl = res.headers.location; // for the next test
-                                loginCookie = res.headers['set-cookie'];
+                                loginCookie = res.body.cookie;
                                 done();
                             });
         

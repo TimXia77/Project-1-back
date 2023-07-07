@@ -102,7 +102,6 @@ app.post("/login", (req, res) => {
     if (dataLayer.findUser(req.body.username, req.body.password)) {
         try {
             const token = authHelper.createUserToken(req.body.username);
-            //res.cookie("token", token);
 
             return res.status(200).json({ cookie: token });
 
@@ -118,9 +117,7 @@ app.post("/login", (req, res) => {
 
 //Data page //removed cache(15)
 app.post("/table", (req, res) => {
-    // FIND AND VALIDATE JWT
-    console.log('this is the users cookie!: ' + JSON.stringify(req.body.cookie)); //JSON.stringify(req)
-    
+
     if (authHelper.authCookie(req.body.cookie)){
         res.status(200).json(dataLayer.readTable());
     } else {
