@@ -198,7 +198,7 @@ paths:
                     type: string
                     description: The user name.
                     example: passWithNoNumber
-        '401': 
+        '409': 
           description: Bad request (e.g. taken username or password)
           content:
             application/json:
