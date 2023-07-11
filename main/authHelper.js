@@ -43,7 +43,7 @@ cookieJwtAuth = (req, res, next) => {
         next();
     } catch (err) {
         res.clearCookie("token");
-        return res.json("ERROR FINDING COOKIE");
+        return res.redirect("/login?cookie=false");
     }
 }
 

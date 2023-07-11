@@ -3,6 +3,7 @@
 const express = require("express");
 const app = express();
 
+var path = require('path');
 const cors = require('cors');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -17,7 +18,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(cookieParser());
-app.use(express.static(__dirname + "/views"));
+app.use(express.static(__dirname + "/../../front-end"));
 app.use(express.json());
 
 //Data access layer
@@ -33,36 +34,35 @@ const PORT = 3000;
 
 //Data that is off limits (used for testing) / Code to aid testing:
 dataLayer.deleteUser('newUserTest');
-// const existingEmail = 'TestTest@test.test';
-// const existingUsername = 'existUserTest';
-
-// const newEmail = "TestExisting@test.test"
-// const newUsername = 'newUserTest';
 
 //API Specification:
 const swaggerDocument = YAML.load('./apiSpecification.yaml');
 
 const swaggerOptions = {
     swaggerDefinition: swaggerDocument,
-    apis: ['./server.js'], // Update with your actual route files
+    apis: ['./server.js'], 
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //http://localhost:3000/api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); 
 
 
 //Routes
 
+app.get(registerPage, (req, res) => {
+    res.sendFile(path.resolve('../../front-end/register-en.html'));
+});
+
 app.post(registerPage, async (req, res) => {
     if (!((req.body.email).includes("@"))) {        //Check if username, password, and email pass restrictions
-        return res.status(400).json({ error: 'Invalid format for email' });
+        return res.status(400).redirect('/register?error=email');
 
     } else if (!(/^[a-zA-Z0-9_]{2,}$/.test(req.body.username))) {
-        return res.status(400).json({ error: 'Invalid format for username' });
+        return res.status(400).redirect('/register?error=username');
 
     } else if (!(/[0-9]/.test(req.body.password) && /[A-Z]/.test(req.body.password) && /[a-z]/.test(req.body.password) && (req.body.password).length >= 8)) {
-        return res.status(400).json({ error: 'Invalid format for password' });
+        return res.status(400).redirect('/register?error=password');
 
     }
     
@@ -73,21 +73,22 @@ app.post(registerPage, async (req, res) => {
     const emailUser = dataArr.find(findUser => findUser.email === req.body.email);
 
     if (usernameUser && emailUser) {     //Check if username, password, and email are not taken
-        return res.status(409).json({error: 'Username and email taken' });
+        return res.status(409).redirect('/register?error=taken-user-email');
 
     } else if (emailUser) {              
-        return res.status(409).json({error: 'Email already taken' });
+        return res.status(409).redirect('/register?error=taken-email');
         
     } else if (usernameUser) {          
-        return res.status(409).json({error: 'Username already taken' });
+        return res.status(409).redirect('/register?error=taken-user');
 
     } else {
         try {   //valid information! Creating account
 
             await (dataLayer.addUser(req.body.email, req.body.username, req.body.password));
             const token = authHelper.createUserToken(req.body.username);
+            res.cookie("token", token);
 
-            return res.status(200).json({ cookie: token }); 
+            return res.redirect(`/table?user=${req.body.username}`); //status 200
 
         } catch {
             res.status(500).send("Internal error occured when registering!");
@@ -96,31 +97,50 @@ app.post(registerPage, async (req, res) => {
 });
 
 
+app.get('/login', (req, res) => {
+    res.sendFile(path.resolve('../../front-end/login-en.html'));
+});
+
 app.post("/login", (req, res) => {
     if (dataLayer.findUser(req.body.username, req.body.password)) {
         try {
             const token = authHelper.createUserToken(req.body.username);
+            res.cookie("token", token);
 
-            return res.status(200).json({ cookie: token });
-
+            return res.redirect(`/table?user=${req.body.username}`); //status 200
+            
         } catch {
-            res.status(500).send("Internal error occured when logging in!");
+            res.status(500).redirect('/login?error=internal');
         }
     } else {
-        return res.status(401).json({error: 'Invalid Login Information' });
+        return res.status(401).redirect('/login?error=login');
     }
 
 });
 
+app.post('/logout', (req, res) => {
+    if (req.cookies.token) {
+        res.clearCookie("token");
+        res.status(302).redirect("/login?logout=true");
+    } else {
+        res.status(405).send("Invalid JWT");
+    }
+});
 
 //Data page 
 //Inventory Management: When the table is updated, the cache should be updated.
-app.post("/table", cache(3600), (req, res) => {
+app.post("/table", authHelper.cookieJwtAuth, cache(3600), (req, res) => {
     if (authHelper.authCookie(req.body.cookie)){
         res.status(200).json(dataLayer.readTable());
     } else {
         res.status(405).json({error: 'Authentication failed' });
     }
+});
+
+app.get("/table", authHelper.cookieJwtAuth, (req, res) => {
+    // res.sendFile(__dirname + '/../static/index.html');
+    res.sendFile(path.resolve('../../front-end/table.html'));
+
 });
 
 

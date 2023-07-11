@@ -20,6 +20,7 @@ function findUser(targetUsername, targetPassword) {
             return true;
         }
     } 
+
     return false;
 }
 
