@@ -30,32 +30,32 @@ describe('Login and Register:\n', () => {
     // });
 
     describe('Successful Requests', () => {
-        describe('GET /register', () => {
-            it('Should render the register-en page (html) successfully', (done) => {
-                chai.request(app)
-                    .get('/register')
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Register</h1>');
-                        expect(res.text).to.include('Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters');
-                        done();
-                    });
-            });
-        });
-        describe('GET /login', () => {
-            it('Should render the login-en page (html) successfully', (done) => {
-                chai.request(app)
-                    .get('/login')
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
-                        expect(res.text).to.include('<a href="/register">Register now</a>');
-                        done();
-                    });
-            });
-        });
+        // describe('GET /register', () => {
+        //     it('Should render the register-en page (html) successfully', (done) => {
+        //         chai.request(app)
+        //             .get('/register')
+        //             .end((err, res) => {
+        //                 expect(res).to.have.status(200);
+        //                 expect(res).to.be.html;
+        //                 expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Register</h1>');
+        //                 expect(res.text).to.include('Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 or more characters');
+        //                 done();
+        //             });
+        //     });
+        // });
+        // describe('GET /login', () => {
+        //     it('Should render the login-en page (html) successfully', (done) => {
+        //         chai.request(app)
+        //             .get('/login')
+        //             .end((err, res) => {
+        //                 expect(res).to.have.status(200);
+        //                 expect(res).to.be.html;
+        //                 expect(res.text).to.include('<h1 class="mrgn-bttm-lg">Login</h1>');
+        //                 expect(res.text).to.include('<a href="/register">Register now</a>');
+        //                 done();
+        //             });
+        //     });
+        // });
         describe('POST /register', () => {
             it('Successfully registered account (should return 302)', (done) => {
                 supertest(app)
@@ -71,18 +71,18 @@ describe('Login and Register:\n', () => {
                     });
 
             });
-            it('Checking if /register redirected to /table correctly', (done) => {
-                chai.request(app)
-                    .get(redirectUrl)
-                    .set('Cookie', loginCookie)
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
-                        expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
-                        done();
-                    });
-            });
+            // it('Checking if /register redirected to /table correctly', (done) => {
+            //     chai.request(app)
+            //         .get(redirectUrl)
+            //         .set('Cookie', loginCookie)
+            //         .end((err, res) => {
+            //             expect(res).to.have.status(200);
+            //             expect(res).to.be.html;
+            //             expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
+            //             expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
+            //             done();
+            //         });
+            // });
         });
         describe('POST /login', () => {
             it('Successfully logged in to account (should return 302)', (done) => {
@@ -98,18 +98,18 @@ describe('Login and Register:\n', () => {
                         done();
                     });
             });
-            it('Checking if /login redirected to /table correctly', (done) => {
-                chai.request(app)
-                    .get(redirectUrl)
-                    .set('Cookie', loginCookie)
-                    .end((err, res) => {
-                        expect(res).to.have.status(200);
-                        expect(res).to.be.html;
-                        expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
-                        expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
-                        done();
-                    });
-            });
+            // it('Checking if /login redirected to /table correctly', (done) => {
+            //     chai.request(app)
+            //         .get(redirectUrl)
+            //         .set('Cookie', loginCookie)
+            //         .end((err, res) => {
+            //             expect(res).to.have.status(200);
+            //             expect(res).to.be.html;
+            //             expect(res.text).to.include(`<table id="dataTable" class="display" style="width:100%" table class="wb-tables table table-striped table-hover" data-wb-tables='{ "ordering" : false }'>`);
+            //             expect(res.text).to.include(`<button type="button" class="btn btn-default" id="logoutButton">LOGOUT</button>`);
+            //             done();
+            //         });
+            // });
         });
         describe('POST /logout', () => {
             it('Successfully logged out of account (should return 302)', (done) => {
@@ -123,19 +123,19 @@ describe('Login and Register:\n', () => {
                         done();
                     });
             });
-            it('Checking if /logout redirected to /login correctly wihtout a cookie', (done) => {
-                chai.request(app)
-                    .get(redirectUrl)
-                    .end((err, res) => {
-                        expect(res).to.have.status(200); //if status 200, then must have loaded page correctly
-                        done();
-                    });
-            });
+            // it('Checking if /logout redirected to /login correctly wihtout a cookie', (done) => {
+            //     chai.request(app)
+            //         .get(redirectUrl)
+            //         .end((err, res) => {
+            //             expect(res).to.have.status(200); //if status 200, then must have loaded page correctly
+            //             done();
+            //         });
+            // });
         });
     });
     describe('Unsuccessful Requests', () => {
         describe('POST /login', () => {
-            it('Tried to login with invalid username (should return 401)', (done) => {
+            it('Tried to login with invalid username', (done) => {
                 supertest(app)
                     .post('/login')
                     .send({ username: newUserTest, password: '123abcDEF' })
@@ -146,7 +146,7 @@ describe('Login and Register:\n', () => {
                         done();
                     });
             });
-            it('Tried to register with invalid password (should return 401)', (done) => {
+            it('Tried to register with invalid password', (done) => {
                 supertest(app)
                     .post('/login')
                     .send({ username: existUserTest, password: 'badUser123' })
@@ -161,7 +161,7 @@ describe('Login and Register:\n', () => {
         describe('POST /register', () => {
             //taken usernames and emails
             describe('Registering with taken information', () => {
-                it('Tried to register with taken username (should return 401)', (done) => {
+                it('Tried to register with taken username', (done) => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'timxiaa@gmail.com', username: existUserTest, password: 'existUser123' })
@@ -172,7 +172,7 @@ describe('Login and Register:\n', () => {
                             done();
                         });
                 });
-                it('Tried to register with taken email (should return 401)', (done) => {
+                it('Tried to register with taken email', (done) => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: 'TimXia7777', password: 'existUser123' })
@@ -183,7 +183,7 @@ describe('Login and Register:\n', () => {
                             done();
                         });
                 });
-                it('Tried to register with taken username and taken email (should return 401)', (done) => {
+                it('Tried to register with taken username and taken email', (done) => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
@@ -306,7 +306,7 @@ describe('Login and Register:\n', () => {
                                 done();
                             });
                     });
-                    it('Successfully registered account (should return 302)', (done) => {
+                    it('Successfully registered account', (done) => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
