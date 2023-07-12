@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 //Data access layer
-const dataLayer = require("./../data.js"); 
+const dataLayer = require("../data.js"); 
 
 /*
     Function:       checkLogin

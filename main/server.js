@@ -22,7 +22,7 @@ app.use(express.static(__dirname + "/../../front-end"));
 app.use(express.json());
 
 //Data access layer
-const dataLayer = require("./../data.js");
+const dataLayer = require("../data.js");
 
 //Helper Modules
 const authHelper = require("./authHelper.js")(app);

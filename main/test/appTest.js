@@ -7,7 +7,7 @@ const app = require("../server");
 const cookieParser = require("cookie-parser");
 
 //Data access layer (to clear login data before testing) 
-const dataLayer = require('./../../data.js');
+const dataLayer = require('../../data.js');
 
 //Middleware
 const { expect } = chai;
