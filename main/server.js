@@ -48,7 +48,14 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); 
 
 
-//Routes
+//Routes 
+
+
+//docker test with local views
+
+//dockerize front end
+
+//create container with both
 
 app.get(registerPage, (req, res) => {
     res.sendFile(path.resolve('../../front-end/register-en.html'));

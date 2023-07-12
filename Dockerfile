@@ -8,11 +8,11 @@ RUN npm install
 WORKDIR /app/main
 RUN npm install
 
-WORKDIR /app
+WORKDIR /app/main
 
 EXPOSE 3000
 
-CMD node main/server.js
+CMD node server.js
 
 # FROM node:alpine
 
