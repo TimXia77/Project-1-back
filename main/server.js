@@ -51,11 +51,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //Routes 
 
 
-//docker test with local views
-
 //dockerize front end
 
-//create container with both
+//create container with both (docker compose )
 
 app.get(registerPage, (req, res) => {
     res.sendFile(path.resolve('../../front-end/register-en.html'));
