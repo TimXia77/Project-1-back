@@ -3,7 +3,8 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const supertest = require('supertest'); //limitations with chai-http -> redirects automatically 
-const app = require("../server");
+const app = require("../server").startServer(4000);
+// const app = require("../server");
 const cookieParser = require("cookie-parser");
 
 //Data access layer (to clear login data before testing) 

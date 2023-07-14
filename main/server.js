@@ -40,12 +40,12 @@ const swaggerDocument = YAML.load('./apiSpecification.yaml');
 
 const swaggerOptions = {
     swaggerDefinition: swaggerDocument,
-    apis: ['./server.js'], 
+    apis: ['./server.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 //Routes 
@@ -70,7 +70,7 @@ app.post(registerPage, async (req, res) => {
         return res.status(400).redirect('/register?error=password');
 
     }
-    
+
 
     const dataArr = dataLayer.readUsers(); //array with user information
 
@@ -80,10 +80,10 @@ app.post(registerPage, async (req, res) => {
     if (usernameUser && emailUser) {     //Check if username, password, and email are not taken
         return res.status(409).redirect('/register?error=taken-user-email');
 
-    } else if (emailUser) {              
+    } else if (emailUser) {
         return res.status(409).redirect('/register?error=taken-email');
-        
-    } else if (usernameUser) {          
+
+    } else if (usernameUser) {
         return res.status(409).redirect('/register?error=taken-user');
 
     } else {
@@ -93,7 +93,7 @@ app.post(registerPage, async (req, res) => {
             const token = authHelper.createUserToken(req.body.username);
             res.cookie("token", token);
 
-            return res.redirect(`/table?user=${req.body.username}`); //status 200
+            return res.redirect(`/table?user=${req.body.username}`);
 
         } catch {
             res.status(500).send("Internal error occured when registering!");
@@ -113,7 +113,7 @@ app.post("/login", (req, res) => {
             res.cookie("token", token);
 
             return res.redirect(`/table?user=${req.body.username}`); //status 200
-            
+
         } catch {
             res.status(500).redirect('/login?error=internal');
         }
@@ -135,10 +135,10 @@ app.post('/logout', (req, res) => {
 //Data page 
 //Inventory Management: When the table is updated, the cache should be updated.
 app.post("/table", authHelper.cookieJwtAuth, cache(3600), (req, res) => {
-    if (authHelper.authCookie(req.body.cookie)){
+    if (authHelper.authCookie(req.body.cookie)) {
         res.status(200).json(dataLayer.readTable());
     } else {
-        res.status(405).json({error: 'Authentication failed' });
+        res.status(405).json({ error: 'Authentication failed' });
     }
 });
 
@@ -157,7 +157,23 @@ app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}/login`);
     console.log(`http://localhost:${PORT}/table`);
     console.log("\nOr check out the specification:")
-    console.log(`http://localhost:3000/api-docs`);
+    console.log(`http://localhost:${PORT}/api-docs`);
 });
 
-module.exports = app; //For automated testing
+
+//Start server for automated tests
+function startServer(PORT) {
+    app.listen(PORT, () => {
+        console.log(`\nRunning on port parameter ${PORT}.`);
+        console.log("Test this at: ");
+        console.log(`http://localhost:${PORT}/register`);
+        console.log(`http://localhost:${PORT}/login`);
+        console.log(`http://localhost:${PORT}/table`);
+        console.log("\nOr check out the specification:")
+        console.log(`http://localhost:${PORT}/api-docs`);
+    });
+
+    return app;
+};
+
+module.exports = { startServer };
