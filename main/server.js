@@ -5,6 +5,7 @@ const app = express();
 
 var path = require('path');
 const cors = require('cors');
+const fetch = require('node-fetch');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
@@ -27,6 +28,7 @@ const dataLayer = require("../data.js");
 //Helper Modules
 const authHelper = require("./authHelper.js")(app);
 const cache = require("./cache.js");
+const { constants } = require("buffer");
 
 //Constants (for readability)
 const registerPage = ["/", "/register"];
@@ -54,6 +56,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //dockerize front end
 
 //create container with both (docker compose )
+
+app.get('/test', async (req, res) => { 
+    const response = await fetch(`http://frontend/login-en.html`);
+    const html = await response.text();
+    console.log("response: " + response);
+    res.send(html);
+});
+
 
 app.get(registerPage, (req, res) => {
     res.sendFile(path.resolve('../../front-end/register-en.html'));
