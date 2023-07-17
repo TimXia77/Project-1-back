@@ -1,1 +1,1 @@
-{"email":"timxia@gmail.com","username":"TimXia77","password":"$2b$10$VH3qW8wFwLS2IxdytfcqJ./lIhA9Iw7qcMIaOqAYO0PI9.NluS50W","role":"basic"}, {"email":"TestTest@test.test","username":"existUserTest","password":"$2b$10$AEmAwlyngc2rWekClqMzje1dzlWx/SgxwedXzLVt/9CccEOKeBi.O","role":"basic"}
+{"email":"timxia@gmail.com","username":"TimXia77","password":"$2b$10$VH3qW8wFwLS2IxdytfcqJ./lIhA9Iw7qcMIaOqAYO0PI9.NluS50W","role":"basic"}, {"email":"TestTest@test.test","username":"existUserTest","password":"$2b$10$4Dq8.mJwDDaoKM0MtL7yn.VO.HJyC8dDXgmWcGOv6CfinzIO0ik9u","role":"basic"}

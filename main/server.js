@@ -58,15 +58,20 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //create container with both (docker compose )
 
 app.get('/test', async (req, res) => { 
-    const response = await fetch(`http://frontend/login-en.html`);
-    const html = await response.text();
-    console.log("response: " + response);
-    res.send(html);
+    const response = await (await fetch(`http://frontend/login-en.html`)).text();
+    res.send(response);
 });
 
 
-app.get(registerPage, (req, res) => {
-    res.sendFile(path.resolve('../../front-end/register-en.html'));
+app.get(registerPage, async (req, res) => {
+    try {
+        const response = await (await fetch(`http://frontend/register-en.html`)).text();
+        res.send(response);
+
+    } catch {
+        console.log("LOCAL REQUEST: /register");
+        res.sendFile(path.resolve('../../front-end/register-en.html'));
+    }
 });
 
 app.post(registerPage, async (req, res) => {
@@ -112,8 +117,14 @@ app.post(registerPage, async (req, res) => {
 });
 
 
-app.get('/login', (req, res) => {
-    res.sendFile(path.resolve('../../front-end/login-en.html'));
+app.get('/login', async (req, res) => {
+    try {
+        const response = await (await fetch(`http://frontend/login-en.html`)).text();
+        res.send(response);
+    } catch {
+        console.log("LOCAL REQUEST: /login");
+        res.sendFile(path.resolve('../../front-end/login-en.html'));
+    }
 });
 
 app.post("/login", (req, res) => {
@@ -152,10 +163,14 @@ app.post("/table", authHelper.cookieJwtAuth, cache(3600), (req, res) => {
     }
 });
 
-app.get("/table", authHelper.cookieJwtAuth, (req, res) => {
-    // res.sendFile(__dirname + '/../static/index.html');
-    res.sendFile(path.resolve('../../front-end/table.html'));
-
+app.get("/table", authHelper.cookieJwtAuth, async (req, res) => {
+    try {
+        const response = await (await fetch(`http://frontend/table.html`)).text();
+        res.send(response);
+    } catch {
+        console.log("LOCAL REQUEST: /table");
+        res.sendFile(path.resolve('../../front-end/table.html'));
+    }
 });
 
 
