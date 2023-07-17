@@ -1,3 +1,22 @@
+version: "3.8"
+services:
+  frontend:
+    build: 
+      context: ./front-end
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ./front-end:/app/front-end
+    ports:
+      - 3000:3000
+    depends_on:
+      - frontend
+
 # ORIGINAL:
 #
 # version: "3.8"
@@ -14,18 +33,18 @@
 
 # WORKS WITH ONLY ONE CONTAINER:
 
-version: "3.8"
-services:
-#   frontend:
-#     build: ./front-end
+# version: "3.8"
+# services:
+# #   frontend:
+# #     build: ./front-end
+# #     ports:
+# #       - 80:80
+#   api:
+#     build: ./api
+#     volumes:
+#       - ./front-end:/app/front-end
 #     ports:
-#       - 80:80
-  api:
-    build: ./api
-    volumes:
-      - ./front-end:/app/front-end
-    ports:
-      - 3000:3000
+#       - 3000:3000
 
 
 # version: "3.8"
