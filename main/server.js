@@ -1,26 +1,17 @@
 
 //Requires
-const express = require("express");
-const app = express();
-
-var path = require('path');
-const cors = require('cors');
-const fetch = require('node-fetch');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-var cookieParser = require("cookie-parser");
-const bodyParser = require('body-parser'); //parse body of post req
-require('dotenv').config();
-
-app.set("view engine", "ejs");
-
-//Middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
-app.use(cookieParser());
-app.use(express.static(__dirname + "/../../front-end"));
-app.use(express.json());
+const {
+    express,
+    path,
+    cors,
+    fetch,
+    swaggerJSDoc,
+    swaggerUi,
+    YAML,
+    cookieParser,
+    bodyParser,
+    app
+} = require('./dependencies');
 
 //Data access layer
 const dataLayer = require("../data.js");
@@ -28,7 +19,6 @@ const dataLayer = require("../data.js");
 //Helper Modules
 const authHelper = require("./authHelper.js")(app);
 const cache = require("./cache.js");
-const { constants } = require("buffer");
 
 //Constants (for readability)
 const registerPage = ["/", "/register"];
@@ -46,18 +36,12 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 //Routes 
 
-
-//dockerize front end
-
-//create container with both (docker compose )
-
-app.get('/test', async (req, res) => { 
+app.get('/test', async (req, res) => {
     const response = await (await fetch(`http://frontend/login-en.html`)).text();
     res.send(response);
 });

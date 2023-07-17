@@ -1,17 +1,35 @@
 
+//Requires: 
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 
+/*
+    Function:       readUsers
+    Purpose:        Returns an array of all users {email, username, password, role}
+    Middleware:     NO
+*/
 function readUsers() {
     let data = fs.readFileSync('../data/accounts.txt', 'utf8');
     return JSON.parse(`[${data}]`);
 }
 
+/*
+    Function:       readTable
+    Purpose:        Returns an array of objects. Each object contains the data for one pendrive.
+    Middleware:     NO
+*/
 function readTable(){
     let data = fs.readFileSync('../data/table.txt', 'utf8');
     return JSON.parse(data);
 }
 
+/*
+    Function:       findUser
+    Purpose:        Takes a username and password and checks if the user exists
+    Middleware:     NO
+    in:             username to find
+    in:             password to find
+*/
 function findUser(targetUsername, targetPassword) {
     const targetUser = readUsers().find(user => user.username === targetUsername);
 
@@ -24,31 +42,50 @@ function findUser(targetUsername, targetPassword) {
     return false;
 }
 
+/*
+    Function:       findUser
+    Purpose:        Takes a username, password, and email and adds a user with role "basic"
+    Middleware:     NO
+    in:             email to add
+    in:             username to add
+    in:             password to add
+*/
 async function addUser(newEmail, newUsername, newPassword) {
-    const hashedPassword = await bcrypt.hash(newPassword, 10); //hashing salt is saved with the hashed password automatically
-    const newUser = JSON.stringify({ email: newEmail, username: newUsername, password: hashedPassword, role: "basic" });
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10); //hashing salt is saved with the hashed password automatically
+        const newUser = JSON.stringify({ email: newEmail, username: newUsername, password: hashedPassword, role: "basic" });
 
-    if (fs.readFileSync('../data/accounts.txt', 'utf8').trim() == "") { //if first account added
-        fs.appendFile("../data/accounts.txt", newUser, err => {
-            if (err) {
-                console.err;
-                return;
-            }
-        });
+        if (fs.readFileSync('../data/accounts.txt', 'utf8').trim() == "") { //if first account added
+            fs.appendFile("../data/accounts.txt", newUser, err => {
+                if (err) {
+                    console.err;
+                    return true;
+                }
+            });
 
-    } else {
-        let modifiedData = ", " + newUser;
-        fs.appendFile("../data/accounts.txt", modifiedData, err => {
-            if (err) {
-                console.err;
-                return;
-            }
-        });
+        } else {
+            let modifiedData = ", " + newUser;
+            fs.appendFile("../data/accounts.txt", modifiedData, err => {
+                if (err) {
+                    console.err;
+                    return true;
+                }
+            });
 
+        }
+    } catch {
+        return false;
     }
+    
 }
 
-function writeData(dataString) { //helper
+/*
+    Function:       writeData
+    Purpose:        writes the dataString to the accounts.txt. This function is 'PRIVATE'.
+    Middleware:     NO
+    in:             string to write
+*/
+function writeData(dataString) { 
     fs.writeFile("../data/accounts.txt", dataString, err => {
         if (err) {
             console.error(err);
@@ -58,6 +95,12 @@ function writeData(dataString) { //helper
     });
 }
 
+/*
+    Function:       deleteUser
+    Purpose:        deletes user with given username. If not found, nothing is deleted.
+    Middleware:     NO
+    in:             target user's username
+*/
 function deleteUser(targetUsername) {
     let accounts = readUsers();
     for (let i = 0; i < accounts.length; i++) {
@@ -65,10 +108,10 @@ function deleteUser(targetUsername) {
             accounts.splice(i, 1);
             const newAccounts = JSON.stringify(accounts).substring(1, JSON.stringify(accounts).length - 1);
             writeData(newAccounts);
-            return;
+            return true;
         }
     }
-    //tried to deleted a user that doesn't exist
+    return false;
 }
 
 

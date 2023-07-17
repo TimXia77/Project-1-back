@@ -9,7 +9,7 @@ module.exports = duration => (req, res, next) => {
             res.json(cachedResponse);
         } else {
             res.originalSend = res.send;
-            res.send = body => { //setting body of res to cache, so any responses will also go to cache.
+            res.send = body => {    //setting body of res to cache, so any responses will also go to cache.
                 res.originalSend(body);
                 cache.set(key, body, duration);
             };

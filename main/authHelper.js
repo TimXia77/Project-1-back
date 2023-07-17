@@ -49,9 +49,9 @@ cookieJwtAuth = (req, res, next) => {
 
 /*
     Function:       authCookie
-    Purpose:        
+    Purpose:        Takes a cookie (string) and verifies its validilty. True if valid, false if not valid.
     Middleware:     NO
-    in:             
+    in:             cookie to be validated (string)
 */
 function authCookie(token){
     try {
