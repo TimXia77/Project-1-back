@@ -1,4 +1,5 @@
-version: "3.8"
+# With Proxy
+version: "3.6"
 services:
   frontend:
     build: 
@@ -10,13 +11,21 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    volumes:
-      - ./front-end:/app/front-end
     ports:
       - 3000:3000
     depends_on:
       - frontend
+  proxy:
+    build:
+      context: ./proxy  
+      dockerfile: Dockerfile 
+    ports:
+      - 4000:4000  
+    depends_on:
+      - frontend
+      - api
 
+# Before Proxy
 # version: "3.6"
 # services:
 #   frontend:
@@ -33,4 +42,5 @@ services:
 #       - 3000:3000
 #     depends_on:
 #       - frontend
+
 
