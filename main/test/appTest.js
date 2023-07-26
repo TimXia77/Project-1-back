@@ -113,7 +113,7 @@ describe('Login and Register:\n', () => {
                     .expect(302)
                     .end((err, res) => {
                         if (err) throw err;
-                        expect(res.header.location).to.equal('/login?error=login');
+                        expect(res.header.location).to.equal('http://localhost:80/login-en.html?error=login');
                         done();
                     });
             });
@@ -124,7 +124,7 @@ describe('Login and Register:\n', () => {
                     .expect(302)
                     .end((err, res) => {
                         if (err) throw err;
-                        expect(res.header.location).to.equal('/login?error=login');
+                        expect(res.header.location).to.equal('http://localhost:80/login-en.html?error=login');
                         done();
                     });
             });
@@ -139,7 +139,7 @@ describe('Login and Register:\n', () => {
                         .expect(302)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('/register?error=taken-user');
+                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-user');
                             done();
                         });
                 });
@@ -150,7 +150,7 @@ describe('Login and Register:\n', () => {
                         .expect(302)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('/register?error=taken-email');
+                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-email');
                             done();
                         });
                 });
@@ -161,7 +161,7 @@ describe('Login and Register:\n', () => {
                         .expect(302)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('/register?error=taken-user-email');
+                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-user-email');
                             done();
                         });
                 });
@@ -180,7 +180,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=password');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
                                 done();
                             });
                         
@@ -192,7 +192,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=password');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
                                 done();
                             });
                     });
@@ -203,7 +203,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=password');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
                                 done();
                             });
                     });
@@ -214,7 +214,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=password');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
                                 done();
                             });
                     });
@@ -227,7 +227,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=username');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
                                 done();
                             });
                     });
@@ -238,7 +238,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=username');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
                                 done();
                             });
                     });
@@ -249,7 +249,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=username');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
                                 done();
                             });
                     });
@@ -260,7 +260,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=username');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
                                 done();
                             });
                     });
@@ -273,7 +273,7 @@ describe('Login and Register:\n', () => {
                             .expect(302)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('/register?error=email');
+                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=email');
                                 done();
                             });
                     });
