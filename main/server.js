@@ -1,3 +1,4 @@
+console.log("Proxy in place, trying to solve 404");
 
 //Requires
 const {
@@ -12,6 +13,14 @@ const {
     bodyParser,
     app
 } = require('./dependencies');
+
+// app.use(require('morgan')('dev'));
+// const debug = require('debug')('app:server'); // Use a custom debug namespace
+
+// app.use((req, res, next) => {
+//   debug(`${req.method} ${req.url}`);
+//   next();
+// });
 
 //Data access layer
 const dataLayer = require("../data.js");
@@ -41,12 +50,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //Routes 
 
-app.get('/test', async (req, res) => {
-    const response = await (await fetch(`http://frontend/login-en.html`)).text();
-    res.send(response);
-});
-
-
 app.get(registerPage, async (req, res) => {
     try {
         const response = await (await fetch(`http://frontend/register-en.html`)).text();
@@ -60,13 +63,13 @@ app.get(registerPage, async (req, res) => {
 
 app.post(registerPage, async (req, res) => {
     if (!((req.body.email).includes("@"))) {        //Check if username, password, and email pass restrictions
-        return res.status(400).redirect('/register?error=email');
+        return res.status(400).redirect('http://localhost:80/register-en.html?error=email');
 
     } else if (!(/^[a-zA-Z0-9_]{2,}$/.test(req.body.username))) {
-        return res.status(400).redirect('/register?error=username');
+        return res.status(400).redirect('http://localhost:80/register-en.html?error=username');
 
     } else if (!(/[0-9]/.test(req.body.password) && /[A-Z]/.test(req.body.password) && /[a-z]/.test(req.body.password) && (req.body.password).length >= 8)) {
-        return res.status(400).redirect('/register?error=password');
+        return res.status(400).redirect('http://localhost:80/register-en.html?error=password');
 
     }
 
@@ -77,13 +80,13 @@ app.post(registerPage, async (req, res) => {
     const emailUser = dataArr.find(findUser => findUser.email === req.body.email);
 
     if (usernameUser && emailUser) {     //Check if username, password, and email are not taken
-        return res.status(409).redirect('/register?error=taken-user-email');
+        return res.status(409).redirect('http://localhost:80/register-en.html?error=taken-user-email');
 
     } else if (emailUser) {
-        return res.status(409).redirect('/register?error=taken-email');
+        return res.status(409).redirect('http://localhost:80/register-en.html?error=taken-email');
 
     } else if (usernameUser) {
-        return res.status(409).redirect('/register?error=taken-user');
+        return res.status(409).redirect('http://localhost:80/register-en.html?error=taken-user');
 
     } else {
         try {   //valid information! Creating account
@@ -92,7 +95,7 @@ app.post(registerPage, async (req, res) => {
             const token = authHelper.createUserToken(req.body.username);
             res.cookie("token", token);
 
-            return res.redirect(`/table?user=${req.body.username}`);
+            return res.redirect(`http://localhost:80/table.html?user=${req.body.username}`);
 
         } catch {
             res.status(500).send("Internal error occured when registering!");
@@ -102,6 +105,7 @@ app.post(registerPage, async (req, res) => {
 
 
 app.get('/login', async (req, res) => {
+    console.log('GET IN LOGIN');
     try {
         const response = await (await fetch(`http://frontend/login-en.html`)).text();
         res.send(response);
@@ -112,29 +116,37 @@ app.get('/login', async (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+    console.log('ASDASDASD');
     if (dataLayer.findUser(req.body.username, req.body.password)) {
+        console.log("Found a user!");
         try {
             const token = authHelper.createUserToken(req.body.username);
             res.cookie("token", token);
-
-            return res.redirect(`/table?user=${req.body.username}`); //status 200
+            console.log('TO THE TABLE!!');
+            return res.redirect(`http://localhost:80/table.html?user=${req.body.username}`); //status 200
 
         } catch {
-            res.status(500).redirect('/login?error=internal');
+            res.status(500).redirect('http://localhost:80/login-en.html?error=internal');
         }
     } else {
-        return res.status(401).redirect('/login?error=login');
+        console.log("INVALID LOGIN!");
+        return res.status(401).redirect('http://localhost:80/login-en.html?error=login');
     }
 
 });
 
 app.post('/logout', (req, res) => {
-    if (req.cookies.token) {
-        res.clearCookie("token");
-        res.status(302).redirect("/login?logout=true");
-    } else {
-        res.status(405).send("Invalid JWT");
-    }
+    // console.log('req.cookies: ' + JSON.stringify(req.cookies));
+    // // console.log('response.headers.get("set-cookie");: ' + res.headers.get('set-cookie'));
+    // if (req.cookies.token) {
+    //     res.clearCookie("token");
+    //     res.status(302).redirect("http://localhost:80/login-en.html?logout=true");
+    // } else {
+    //     res.status(405).send("Invalid JWT");
+    // }
+    console.log('req.cookies: ' + JSON.stringify(req.cookies));
+    res.clearCookie("token");
+    res.status(302).redirect("http://localhost:80/login-en.html?logout=true");
 });
 
 //Data page 
@@ -159,14 +171,24 @@ app.get("/table", authHelper.cookieJwtAuth, async (req, res) => {
 
 
 //Start the server
+// app.listen(PORT, () => {
+//     console.log(`\nRunning on port ${PORT}.`);
+//     console.log("Test this at: ");
+//     console.log(`http://localhost:${PORT}/register-en.html`);
+//     console.log(`http://localhost:${PORT}/login-en.html`);
+//     console.log(`http://localhost:${PORT}/table.html`);
+//     console.log("\nOr check out the specification:")
+//     console.log(`http://localhost:${PORT}/api-docs`);
+// });
+
 app.listen(PORT, () => {
-    console.log(`\nRunning on port ${PORT}.`);
+    console.log(`\nRunning on port 80.`);
     console.log("Test this at: ");
-    console.log(`http://localhost:${PORT}/register`);
-    console.log(`http://localhost:${PORT}/login`);
-    console.log(`http://localhost:${PORT}/table`);
+    console.log(`http://localhost:80/register-en.html`);
+    console.log(`http://localhost:80/login-en.html`);
+    console.log(`http://localhost:80/table.html`);
     console.log("\nOr check out the specification:")
-    console.log(`http://localhost:${PORT}/api-docs`);
+    console.log(`http://localhost:80/api-docs`);
 });
 
 
@@ -175,8 +197,8 @@ function startServer(PORT) {
     app.listen(PORT, () => {
         console.log(`\nRunning on port parameter ${PORT}.`);
         console.log("Test this at: ");
-        console.log(`http://localhost:${PORT}/register`);
-        console.log(`http://localhost:${PORT}/login`);
+        console.log(`http://localhost:${PORT}/register-en.html`);
+        console.log(`http://localhost:${PORT}/login-en.html`);
         console.log(`http://localhost:${PORT}/table`);
         console.log("\nOr check out the specification:")
         console.log(`http://localhost:${PORT}/api-docs`);

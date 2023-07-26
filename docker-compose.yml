@@ -16,3 +16,21 @@ services:
       - 3000:3000
     depends_on:
       - frontend
+
+# version: "3.6"
+# services:
+#   frontend:
+#     build: 
+#       context: ./front-end
+#       dockerfile: Dockerfile
+#     ports:
+#       - 80:80
+#   api:
+#     build:
+#       context: ./api
+#       dockerfile: Dockerfile
+#     ports:
+#       - 3000:3000
+#     depends_on:
+#       - frontend
+

@@ -16,7 +16,7 @@ checkLogin = (req, res, next) => {
     const token = req.cookies.token;
 
     if (token != undefined) { //if the user has logged in
-        return res.redirect("/table");
+        return res.redirect("/table.html");
     }
     next();
 }
@@ -35,15 +35,16 @@ cookieJwtAuth = (req, res, next) => {
 
         if (Date.now() >= expirationTime) {
             // Token has expired
+            console.log('IN AUTH HELPER');
             res.clearCookie("token");
-            return res.redirect("/login");
+            return res.redirect("/login-en.html");
         }
 
         req.user = decoded;
         next();
     } catch (err) {
         res.clearCookie("token");
-        return res.redirect("/login?cookie=false");
+        return res.redirect("/login-en.html?cookie=false");
     }
 }
 
@@ -96,7 +97,7 @@ function authRole(role) {
 */
 function createUserToken(userName) {
     const user = {username: userName};
-    const token = jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "10m" });
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "1m" });
     return token;
 }
 
