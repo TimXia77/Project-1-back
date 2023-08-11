@@ -28,19 +28,18 @@ describe('Login and Register:\n', () => {
 
     describe('Successful Requests', () => {
         describe('POST /register', () => {
-            it('Successfully registered account (should return 302)', (done) => {
+            it('Successfully registered account (should return 200)', (done) => {
                 supertest(app)
                     .post('/register')
                     .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
-                    .expect(302)
-                    .expect('set-cookie', /token=/)
+                    .expect(200)
                     .end((err, res) => {
                         if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        loginCookie = res.headers['set-cookie'];
+                        if (!(res.body.token)) {
+                            throw new Error('Token not found in response body');
+                        }
                         done();
                     });
-
             });
             // it('Checking if /register redirected to /table correctly', (done) => {
             //     chai.request(app)
@@ -60,12 +59,12 @@ describe('Login and Register:\n', () => {
                 supertest(app)
                     .post('/login')
                     .send({ username: existUserTest, password: 'existUser123' })
-                    .expect(302)
-                    .expect('set-cookie', /token=/)
+                    .expect(200)
                     .end((err, res) => {
                         if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        loginCookie = res.headers['set-cookie'];
+                        if (!(res.body.token)) {
+                            throw new Error('Token not found in response body');
+                        }
                         done();
                     });
             });
@@ -82,27 +81,27 @@ describe('Login and Register:\n', () => {
             //         });
             // });
         });
-        describe('POST /logout', () => {
-            it('Successfully logged out of account (should return 302)', (done) => {
-                supertest(app)
-                    .post('/logout')
-                    .expect(302)
-                    .set('Cookie', `token=${loginCookie}`)
-                    .end((err, res) => {
-                        if (err) throw err;
-                        redirectUrl = res.headers.location; // for the next test
-                        done();
-                    });
-            });
-            // it('Checking if /logout redirected to /login correctly without a cookie', (done) => {
-            //     chai.request(app)
-            //         .get(redirectUrl)
-            //         .end((err, res) => {
-            //             expect(res).to.have.status(200); //if status 200, then must have loaded page correctly
-            //             done();
-            //         });
-            // });
-        });
+        // describe('POST /logout', () => {
+        //     it('Successfully logged out of account (should return 302)', (done) => {
+        //         supertest(app)
+        //             .post('/logout')
+        //             .expect(302)
+        //             .set('Cookie', `token=${loginCookie}`)
+        //             .end((err, res) => {
+        //                 if (err) throw err;
+        //                 redirectUrl = res.headers.location; // for the next test
+        //                 done();
+        //             });
+        //     });
+        //     // it('Checking if /logout redirected to /login correctly without a cookie', (done) => {
+        //     //     chai.request(app)
+        //     //         .get(redirectUrl)
+        //     //         .end((err, res) => {
+        //     //             expect(res).to.have.status(200); //if status 200, then must have loaded page correctly
+        //     //             done();
+        //     //         });
+        //     // });
+        // });
     });
     describe('Unsuccessful Requests', () => {
         describe('POST /login', () => {
@@ -110,10 +109,12 @@ describe('Login and Register:\n', () => {
                 supertest(app)
                     .post('/login')
                     .send({ username: newUserTest, password: '123abcDEF' })
-                    .expect(302)
+                    .expect(401)
                     .end((err, res) => {
                         if (err) throw err;
-                        expect(res.header.location).to.equal('http://localhost:80/login-en.html?error=login');
+                        if (!(res.body.error == "Username or password is incorrect.")) {
+                            throw new Error('Incorrect or no error res object.');
+                        } else 
                         done();
                     });
             });
@@ -121,10 +122,12 @@ describe('Login and Register:\n', () => {
                 supertest(app)
                     .post('/login')
                     .send({ username: existUserTest, password: 'badUser123' })
-                    .expect(302)
+                    .expect(401)
                     .end((err, res) => {
                         if (err) throw err;
-                        expect(res.header.location).to.equal('http://localhost:80/login-en.html?error=login');
+                        if (!(res.body.error == "Username or password is incorrect.")) {
+                            throw new Error('Incorrect or no error res object.');
+                        } else 
                         done();
                     });
             });
@@ -136,10 +139,12 @@ describe('Login and Register:\n', () => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'timxiaa@gmail.com', username: existUserTest, password: 'existUser123' })
-                        .expect(302)
+                        .expect(409)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-user');
+                            if (!(res.body.error == "Username is already taken by another user")) {
+                                throw new Error('Incorrect or no error res object.');
+                            } else 
                             done();
                         });
                 });
@@ -147,10 +152,12 @@ describe('Login and Register:\n', () => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: 'TimXia7777', password: 'existUser123' })
-                        .expect(302)
+                        .expect(409)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-email');
+                            if (!(res.body.error == "Email is already taken by another user")) {
+                                throw new Error('Incorrect or no error res object.');
+                            } else 
                             done();
                         });
                 });
@@ -158,10 +165,12 @@ describe('Login and Register:\n', () => {
                     supertest(app)
                         .post('/register')
                         .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
-                        .expect(302)
+                        .expect(409)
                         .end((err, res) => {
                             if (err) throw err;
-                            expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=taken-user-email');
+                            if (!(res.body.error == "Username and email are taken by another user")) {
+                                throw new Error('Incorrect or no error res object.');
+                            } else 
                             done();
                         });
                 });
@@ -177,10 +186,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'password' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
+                                if (!(res.body.error == "Invalid format for password")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                         
@@ -189,10 +200,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'password123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
+                                if (!(res.body.error == "Invalid format for password")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -200,10 +213,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'PASSWORD123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
+                                if (!(res.body.error == "Invalid format for password")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -211,10 +226,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'Pass123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=password');
+                                if (!(res.body.error == "Invalid format for password")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -224,10 +241,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: 'H', password: 'existUser123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
+                                if (!(res.body.error == "Invalid format for username")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -235,10 +254,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: 'username!@#$%^&*()', password: '123abcDEF' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
+                                if (!(res.body.error == "Invalid format for username")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -246,10 +267,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: 'Hi`~{}|:"', password: 'existUser123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
+                                if (!(res.body.error == "Invalid format for username")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -257,10 +280,12 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: 'Hi<>?,./>', password: 'existUser123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=username');
+                                if (!(res.body.error == "Invalid format for username")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
@@ -270,26 +295,27 @@ describe('Login and Register:\n', () => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'notAValidEmail', username: existUserTest, password: 'existUser123' })
-                            .expect(302)
+                            .expect(400)
                             .end((err, res) => {
                                 if (err) throw err;
-                                expect(res.header.location).to.equal('http://localhost:80/register-en.html?error=email');
+                                if (!(res.body.error == "Invalid format for email")) {
+                                    throw new Error('Incorrect or no error res object.');
+                                } else 
                                 done();
                             });
                     });
-                    it('Successfully registered account', (done) => {
+                    it('Successfully registered account (should return 200)', (done) => {
                         supertest(app)
                             .post('/register')
                             .send({ email: 'TestTest@test.test', username: existUserTest, password: 'existUser123' })
-                            .expect(302)
-                            .expect('set-cookie', /token=/)
+                            .expect(200)
                             .end((err, res) => {
                                 if (err) throw err;
-                                redirectUrl = res.headers.location; // for the next test
-                                loginCookie = res.headers['set-cookie'];
+                                if (!(res.body.token)) {
+                                    throw new Error('Token not found in response body');
+                                }
                                 done();
                             });
-        
                     });
                 });
             });

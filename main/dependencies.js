@@ -18,10 +18,7 @@ app.set("view engine", "ejs");
 // Middleware
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors({
-    origin: 'http://localhost:80', // Replace YOUR_FRONTEND_PORT with the actual port of your frontend server
-    credentials: true, // Allow cookies to be included in cross-origin requests
-}));
+app.use(cors());
 app.use(express.static(path.join(__dirname, "/../../front-end")));
 app.use(express.json());
 
