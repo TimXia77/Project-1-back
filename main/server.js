@@ -151,13 +151,13 @@ app.post("/table", authHelper.cookieJwtAuth, (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log(`\nRunning on port 80.`);
+    console.log(`\nRunning on port 4000.`);
     console.log("Test this at: ");
-    console.log(`http://localhost:80/register-en.html`);
-    console.log(`http://localhost:80/login-en.html`);
-    console.log(`http://localhost:80/table.html`);
+    console.log(`http://localhost/register`);
+    console.log(`http://localhost/login`);
+    console.log(`http://localhost/table`);
     console.log("\nOr check out the specification:")
-    console.log(`http://localhost:80/api-docs`);
+    console.log(`http://localhost/api-docs`);
 });
 
 
