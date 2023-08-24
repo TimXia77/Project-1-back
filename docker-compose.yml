@@ -1,4 +1,3 @@
-# With Proxy
 version: "3.6"
 services:
   frontend:
@@ -6,41 +5,27 @@ services:
       context: ./front-end
       dockerfile: Dockerfile
     ports:
-      - 80:80
+      - 4000:4000
+    volumes:
+      - ./front-end:/usr/share/nginx/html  
+    depends_on:
+      - proxy
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
     ports:
       - 3000:3000
-    depends_on:
-      - frontend
   proxy:
     build:
-      context: ./proxy  
-      dockerfile: Dockerfile 
+      context: ./proxy
+      dockerfile: Dockerfile
     ports:
-      - 4000:4000  
+      - 80:80
+    # volumes:
+    #   - ./front-end:/var/www/html  
     depends_on:
-      - frontend
       - api
 
-# Before Proxy
-# version: "3.6"
-# services:
-#   frontend:
-#     build: 
-#       context: ./front-end
-#       dockerfile: Dockerfile
-#     ports:
-#       - 80:80
-#   api:
-#     build:
-#       context: ./api
-#       dockerfile: Dockerfile
-#     ports:
-#       - 3000:3000
-#     depends_on:
-#       - frontend
 
 
